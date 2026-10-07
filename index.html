@@ -3,108 +3,168 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Maheen AI</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-    }
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
 
-    body {
-        margin: 0;
-        background: linear-gradient(135deg, #f8d9ff, #dce7ff);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #f8d9ff, #dce7ff);
+    min-height: 100vh;
 
-    .chat {
-        width: 380px;
-        max-width: 95%;
-        height: 600px;
-        background: white;
-        border-radius: 25px;
-        overflow: hidden;
-        box-shadow: 0 15px 40px rgba(0,0,0,.18);
-        display: flex;
-        flex-direction: column;
-    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    .header {
-        background: linear-gradient(135deg, #8e44ad, #5b6ee1);
-        color: white;
-        padding: 20px;
-        text-align: center;
-    }
+.chat {
+    width: 420px;
+    max-width: 95%;
+    height: 650px;
 
-    .header h2 {
-        margin: 0 0 5px;
-    }
+    background: white;
+    border-radius: 25px;
 
-    .header p {
-        margin: 0;
-        font-size: 13px;
-        opacity: .9;
-    }
+    overflow: hidden;
 
-    #messages {
-        flex: 1;
-        padding: 15px;
-        overflow-y: auto;
-    }
+    box-shadow: 0 15px 40px rgba(0,0,0,.18);
 
-    .message {
-        max-width: 80%;
-        padding: 11px 14px;
-        margin: 9px 0;
-        border-radius: 17px;
-        line-height: 1.4;
-        font-size: 14px;
-    }
+    display: flex;
+    flex-direction: column;
+}
 
-    .bot {
-        background: #f0e7ff;
-        color: #333;
-        border-bottom-left-radius: 5px;
-    }
+.header {
+    background: linear-gradient(135deg, #8e44ad, #5b6ee1);
 
-    .user {
-        background: #6757d9;
-        color: white;
-        margin-left: auto;
-        border-bottom-right-radius: 5px;
-    }
+    color: white;
 
-    .input-area {
-        display: flex;
-        padding: 12px;
-        border-top: 1px solid #eee;
-        gap: 8px;
-    }
+    padding: 20px;
 
-    input {
-        flex: 1;
-        padding: 13px;
-        border: 1px solid #ddd;
-        border-radius: 20px;
-        outline: none;
-    }
+    text-align: center;
+}
 
-    button {
-        border: none;
-        background: #6757d9;
-        color: white;
-        padding: 0 18px;
-        border-radius: 20px;
-        cursor: pointer;
-    }
+.header h2 {
+    margin: 0 0 5px;
+}
 
-    button:hover {
-        background: #5142c4;
-    }
+.header p {
+    margin: 0;
+
+    font-size: 13px;
+
+    opacity: .9;
+}
+
+#messages {
+    flex: 1;
+
+    padding: 15px;
+
+    overflow-y: auto;
+}
+
+.message {
+    max-width: 82%;
+
+    padding: 11px 14px;
+
+    margin: 9px 0;
+
+    border-radius: 17px;
+
+    line-height: 1.5;
+
+    font-size: 14px;
+
+    white-space: pre-wrap;
+}
+
+.bot {
+    background: #f0e7ff;
+
+    color: #333;
+
+    border-bottom-left-radius: 5px;
+}
+
+.user {
+    background: #6757d9;
+
+    color: white;
+
+    margin-left: auto;
+
+    border-bottom-right-radius: 5px;
+}
+
+.typing {
+    background: #f0e7ff;
+
+    color: #555;
+
+    font-style: italic;
+}
+
+.input-area {
+    display: flex;
+
+    padding: 12px;
+
+    border-top: 1px solid #eee;
+
+    gap: 8px;
+}
+
+input {
+    flex: 1;
+
+    padding: 13px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 20px;
+
+    outline: none;
+
+    font-size: 14px;
+}
+
+input:focus {
+    border-color: #6757d9;
+}
+
+button {
+    border: none;
+
+    background: #6757d9;
+
+    color: white;
+
+    padding: 0 18px;
+
+    border-radius: 20px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+button:hover {
+    background: #5142c4;
+}
+
+button:disabled {
+    background: #aaa;
+
+    cursor: not-allowed;
+}
 </style>
+
 </head>
 
 <body>
@@ -112,78 +172,267 @@
 <div class="chat">
 
     <div class="header">
+
         <h2>✨ Maheen AI</h2>
+
         <p>Your friendly AI assistant</p>
+
     </div>
+
 
     <div id="messages">
+
         <div class="message bot">
-            Hi! 👋 Main Maheen AI hoon. 
-            Main friendly, helpful aur positive rehne ki koshish karti hoon. 
+            Hi! 👋 Main Maheen AI hoon.
+
+            Main friendly, helpful aur positive rehne ki koshish karti hoon.
+
             Batao, aaj kis cheez mein help chahiye? 💜
         </div>
+
     </div>
 
+
     <div class="input-area">
-        <input id="userInput" type="text"
-               placeholder="Maheen se baat karo..."
-               onkeydown="if(event.key==='Enter') sendMessage()">
-        <button onclick="sendMessage()">Send</button>
+
+        <input
+            id="userInput"
+            type="text"
+            placeholder="Maheen se baat karo..."
+        >
+
+        <button id="sendButton" onclick="sendMessage()">
+            Send
+        </button>
+
     </div>
 
 </div>
 
+
 <script>
+
+const input = document.getElementById("userInput");
+
+const sendButton = document.getElementById("sendButton");
+
+
+// Enter key
+input.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        sendMessage();
+
+    }
+
+});
+
+
+// Send message
 function sendMessage() {
 
-    const input = document.getElementById("userInput");
     const text = input.value.trim();
 
     if (!text) return;
 
+
+    // User message
     addMessage(text, "user");
+
+
+    // Clear input
     input.value = "";
 
-    setTimeout(() => {
+
+    // Disable button
+    sendButton.disabled = true;
+
+
+    // Typing indicator
+    const typing = document.createElement("div");
+
+    typing.className = "message typing";
+
+    typing.id = "typing";
+
+    typing.textContent = "Maheen AI is typing...";
+
+    document.getElementById("messages").appendChild(typing);
+
+
+    scrollMessages();
+
+
+    // AI response
+    setTimeout(function() {
+
+        const typingElement = document.getElementById("typing");
+
+        if (typingElement) {
+            typingElement.remove();
+        }
+
+
         const reply = maheenPersonality(text);
+
         addMessage(reply, "bot");
-    }, 600);
+
+
+        sendButton.disabled = false;
+
+        input.focus();
+
+    }, 700);
+
 }
 
+
+// Add message
 function addMessage(text, type) {
 
     const messages = document.getElementById("messages");
 
     const div = document.createElement("div");
+
     div.className = "message " + type;
+
     div.textContent = text;
 
     messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
+
+    scrollMessages();
+
 }
 
+
+// Scroll
+function scrollMessages() {
+
+    const messages = document.getElementById("messages");
+
+    messages.scrollTop = messages.scrollHeight;
+
+}
+
+
+// Maheen AI personality
 function maheenPersonality(message) {
 
-    const text = message.toLowerCase();
+    const text = message.toLowerCase().trim();
+
 
     // Greetings
     if (
         text.includes("hi") ||
         text.includes("hello") ||
+        text.includes("hey") ||
         text.includes("salam") ||
         text.includes("assalam")
     ) {
-        return "Walaikum Assalam! 🌸 Main Maheen hoon. Aap se baat karke khushi hui! Batao kya scene hai? 😊";
+
+        return "Walaikum Assalam! 🌸 Main Maheen AI hoon. Aap se baat karke khushi hui! Batao, aaj kya karna hai? 😊";
+
     }
 
+
     // Name
-    if (text.includes("your name") || text.includes("naam")) {
-        return "Mera naam Maheen AI hai ✨ Mujhe friendly aur helpful assistant ke taur par design kiya gaya hai.";
+    if (
+        text.includes("your name") ||
+        text.includes("tumhara naam") ||
+        text.includes("apka naam") ||
+        text.includes("naam kya")
+    ) {
+
+        return "Mera naam Maheen AI hai ✨ Main tumhari friendly AI assistant hoon.";
+
     }
+
+
+    // How are you
+    if (
+        text.includes("how are you") ||
+        text.includes("kaisi ho") ||
+        text.includes("kesi ho")
+    ) {
+
+        return "Main bilkul theek hoon! 💜 Tum batao, tum kaisi ho? 😊";
+
+    }
+
 
     // Help
     if (
         text.includes("help") ||
-        text.includes("madad")
+        text.includes("madad") ||
+        text.includes("assist")
     ) {
+
         return "Bilkul! 💜 Main tumhari help karne ke liye ready hoon. Apna task batao.";
+
+    }
+
+
+    // Thanks
+    if (
+        text.includes("thank") ||
+        text.includes("thanks") ||
+        text.includes("shukriya")
+    ) {
+
+        return "You're most welcome! 🌸 Jab bhi zarurat ho, Maheen AI yahan hai. 💜";
+
+    }
+
+
+    // Good morning
+    if (text.includes("good morning")) {
+
+        return "Good morning! ☀️✨ Aaj ka din bohat acha guzray! Batao Maheen AI tumhari kya help kare?";
+
+    }
+
+
+    // Good night
+    if (text.includes("good night")) {
+
+        return "Good night! 🌙💜 Sweet dreams. Kal phir milte hain!";
+
+    }
+
+
+    // Study
+    if (
+        text.includes("study") ||
+        text.includes("parhai") ||
+        text.includes("padhai")
+    ) {
+
+        return "Bilkul 📚 Main tumhari study planning, explanations, notes aur assignments mein help kar sakti hoon.";
+
+    }
+
+
+    // Coding
+    if (
+        text.includes("code") ||
+        text.includes("coding") ||
+        text.includes("programming")
+    ) {
+
+        return "Sure! 💻 Apna coding problem ya code yahan paste karo. Main step-by-step explain karungi.";
+
+    }
+
+
+    // Default response
+    return "Hmm 🤔 Ye interesting hai! Main Maheen AI hoon. Thora detail mein batao ke tum kis cheez ke baare mein poochna chahti ho? 💜";
+
+}
+
+</script>
+
+</body>
+</html>
