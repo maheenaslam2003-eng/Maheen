@@ -1939,25 +1939,26 @@ aria-label="Order on WhatsApp">
 document.getElementById("year").textContent =
 new Date().getFullYear();
 <script>
-  const menuTabs = document.querySelectorAll(".menu-tab");
-  const foodCards = document.querySelectorAll(".food-card");
+(() => {
+  const tabsForMenu = document.querySelectorAll(".menu-tab[data-filter]");
+  const itemsForMenu = document.querySelectorAll(".food-card[data-category]");
 
-  menuTabs.forEach((button) => {
-    button.addEventListener("click", () => {
-      const selectedCategory = button.dataset.filter;
+  tabsForMenu.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const category = tab.dataset.filter.trim().toLowerCase();
 
-      menuTabs.forEach((tab) => tab.classList.remove("active"));
-      button.classList.add("active");
+      tabsForMenu.forEach((item) => {
+        item.classList.toggle("active", item === tab);
+      });
 
-      foodCards.forEach((card) => {
-        const showCard =
-          selectedCategory === "all" ||
-          card.dataset.category === selectedCategory;
-
-        card.style.display = showCard ? "" : "none";
+      itemsForMenu.forEach((card) => {
+        const cardCategory = card.dataset.category.trim().toLowerCase();
+        card.style.display =
+          category === "all" || cardCategory === category ? "" : "none";
       });
     });
   });
+})();
 </script>
 
 </body>
