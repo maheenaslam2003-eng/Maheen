@@ -1938,7 +1938,26 @@ aria-label="Order on WhatsApp">
 
 document.getElementById("year").textContent =
 new Date().getFullYear();
+<script>
+  const menuTabs = document.querySelectorAll(".menu-tab");
+  const foodCards = document.querySelectorAll(".food-card");
 
+  menuTabs.forEach((button) => {
+    button.addEventListener("click", () => {
+      const selectedCategory = button.dataset.filter;
+
+      menuTabs.forEach((tab) => tab.classList.remove("active"));
+      button.classList.add("active");
+
+      foodCards.forEach((card) => {
+        const showCard =
+          selectedCategory === "all" ||
+          card.dataset.category === selectedCategory;
+
+        card.style.display = showCard ? "" : "none";
+      });
+    });
+  });
 </script>
 
 </body>
