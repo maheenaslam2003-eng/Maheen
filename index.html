@@ -1966,38 +1966,122 @@ aria-label="Order on WhatsApp">
 </a>
 
 
+<!-- Supabase library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+const SUPABASE_URL = "https://mybyqwannrnnviumocfw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_c3qgzTFf23oeKpEoI9rONg_xZnw6g7M";
 
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+// Footer year
 document.getElementById("year").textContent =
-new Date().getFullYear();
+  new Date().getFullYear();
 
-(() => {
-  const tabsForMenu = document.querySelectorAll(".menu-tab[data-filter]");
-  const itemsForMenu = document.querySelectorAll(".food-card[data-category]");
+// Menu filters
+const foodGrid = document.getElementById("foodGrid");
+const menuTabs = document.querySelectorAll(".menu-tab[data-filter]");
 
-  tabsForMenu.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const category = tab.dataset.filter.trim().toLowerCase();
-
-      tabsForMenu.forEach((item) => {
-        item.classList.toggle("active", item === tab);
-      });
-
-      itemsForMenu.forEach((card) => {
-        const cardCategory = card.dataset.category.trim().toLowerCase();
-        card.style.display =
-          category === "all" || cardCategory === category ? "" : "none";
-      });
-    });
+function filterMenu(category) {
+  document.querySelectorAll(".food-card").forEach((card) => {
+    card.style.display =
+      category === "all" || card.dataset.category === category
+        ? ""
+        : "none";
   });
-})();
-    const menuButton = document.getElementById("mobileMenuBtn");
+}
+
+menuTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    menuTabs.forEach((item) => item.classList.remove("active"));
+    tab.classList.add("active");
+    filterMenu(tab.dataset.filter.trim().toLowerCase());
+  });
+});
+
+// Safe text for HTML
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+// Load menu from Supabase
+async function loadMenu() {
+  foodGrid.innerHTML = "<p>Loading menu...</p>";
+
+  const { data, error } = await supabaseClient
+    .from("menu_items")
+    .select("*")
+    .eq("available", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    console.error("Menu error:", error);
+    foodGrid.innerHTML =
+      "<p>Menu load nahi ho saka. Please refresh karein.</p>";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    foodGrid.innerHTML = "<p>Abhi menu available nahi hai.</p>";
+    return;
+  }
+
+  foodGrid.innerHTML = data.map((item) => {
+    const name = safeText(item.name);
+    const description = safeText(item.description);
+    const category = String(item.category || "").toLowerCase();
+    const image = safeText(item.image_url);
+    const price = Number(item.price) || 0;
+    const orderText = encodeURIComponent(
+      `I want to order ${item.name} for Rs. ${price}`
+    );
+
+    return `
+      <article class="food-card" data-category="${safeText(category)}">
+        <div class="food-image">
+          <img src="${image}" alt="${name}" loading="lazy">
+        </div>
+        <div class="food-info">
+          <div class="food-name">${name}</div>
+          <div class="food-description">${description}</div>
+          <div class="food-bottom">
+            <div class="price">Rs. ${price}</div>
+            <a class="add-btn"
+              href="https://wa.me/923397860213?text=${orderText}"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Order ${name}">+</a>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  const activeTab = document.querySelector(".menu-tab.active");
+  filterMenu(activeTab ? activeTab.dataset.filter.toLowerCase() : "all");
+}
+
+// Mobile navigation
+const menuButton = document.getElementById("mobileMenuBtn");
 const navLinks = document.querySelector(".nav-links");
 
 menuButton.addEventListener("click", () => {
   const isOpen = navLinks.classList.toggle("open");
   menuButton.setAttribute("aria-expanded", isOpen);
 });
+
+// Start
+loadMenu();
 </script>
     
 </body>
