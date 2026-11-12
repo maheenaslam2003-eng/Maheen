@@ -2039,7 +2039,7 @@ async function loadMenu() {
   foodGrid.innerHTML = data.map((item) => {
     const name = safeText(item.name);
     const description = safeText(item.description);
-    const category = String(item.category || "").toLowerCase();
+   const category = String(item.category || "").trim().toLowerCase().replace(/\s+/g, "-");
     const image = safeText(item.image_url);
     const price = Number(item.price) || 0;
     const orderText = encodeURIComponent(
