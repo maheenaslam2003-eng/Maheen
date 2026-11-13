@@ -2160,6 +2160,19 @@ foodGrid.addEventListener("click", function(event) {
     renderCart();
   }
 });
+    
+document.getElementById("cartItems").addEventListener("click", function(event) {
+  const removeButton = event.target.closest(".remove-cart-item");
+
+  if (!removeButton) return;
+
+  cart = cart.filter(
+    item => String(item.id) !== removeButton.dataset.id
+  );
+
+  renderCart();
+});
+
 
 // Load menu from Supabase
 async function loadMenu() {
