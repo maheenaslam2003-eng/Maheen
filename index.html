@@ -1022,6 +1022,55 @@ footer li{
     }
 }
 
+/* SHOPPING CART */
+.cart-section {
+  padding: 70px 20px;
+  background: #fff8ef;
+}
+
+.cart-section .container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.cart-section h2 {
+  text-align: center;
+  color: #8c2d08;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.cart-subtitle {
+  text-align: center;
+  color: #777;
+  margin-bottom: 30px;
+}
+
+#cartItems {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  min-height: 100px;
+  box-shadow: 0 8px 25px rgba(0,0,0,.06);
+}
+
+.cart-summary {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.cart-summary h3 {
+  color: #8c2d08;
+  margin-bottom: 18px;
+}
+
+#checkoutBtn {
+  border: none;
+  cursor: pointer;
+  padding: 14px 25px;
+  border-radius: 10px;
+}
+
 </style>
 </head>
 
@@ -2040,6 +2089,78 @@ function safeText(value) {
   })[char]);
 }
 
+
+// Shopping Cart
+let cart = [];
+let menuData = [];
+
+function renderCart() {
+  const cartItems = document.getElementById("cartItems");
+  const cartTotal = document.getElementById("cartTotal");
+  const cartCount = document.getElementById("cartCount");
+
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity, 0
+  );
+
+  cartCount.textContent = totalItems;
+  cartTotal.textContent = `Rs. ${totalPrice}`;
+
+  if (cart.length === 0) {
+    cartItems.innerHTML = "<p>Your cart is empty. Add some delicious food!</p>";
+    return;
+  }
+
+  cartItems.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <span>${safeText(item.name)} × ${item.quantity}</span>
+      <span>Rs. ${item.price * item.quantity}</span>
+      <button type="button" class="remove-cart-item" data-id="${item.id}">
+        Remove
+      </button>
+    </div>
+  `).join("");
+}
+
+// Add and remove cart items
+foodGrid.addEventListener("click", function(event) {
+  const addButton = event.target.closest(".add-to-cart");
+  const removeButton = event.target.closest(".remove-cart-item");
+
+  if (addButton) {
+    const item = menuData.find(
+      product => String(product.id) === addButton.dataset.id
+    );
+
+    if (!item) return;
+
+    const existing = cart.find(
+      product => String(product.id) === String(item.id)
+    );
+
+    if (existing) {
+      existing.quantity++;
+    } else {
+      cart.push({
+        id: item.id,
+        name: item.name,
+        price: Number(item.price) || 0,
+        quantity: 1
+      });
+    }
+
+    renderCart();
+  }
+
+  if (removeButton) {
+    cart = cart.filter(
+      item => String(item.id) !== removeButton.dataset.id
+    );
+    renderCart();
+  }
+});
+
 // Load menu from Supabase
 async function loadMenu() {
   foodGrid.innerHTML = "<p>Loading menu...</p>";
@@ -2052,8 +2173,7 @@ async function loadMenu() {
 
   if (error) {
     console.error("Menu error:", error);
-    foodGrid.innerHTML =
-      "<p>Menu load nahi ho saka. Please refresh karein.</p>";
+    foodGrid.innerHTML = "<p>Menu load nahi ho saka. Please refresh karein.</p>";
     return;
   }
 
@@ -2062,15 +2182,15 @@ async function loadMenu() {
     return;
   }
 
+  menuData = data;
+
   foodGrid.innerHTML = data.map((item) => {
     const name = safeText(item.name);
     const description = safeText(item.description);
-   const category = String(item.category || "").trim().toLowerCase().replace(/\s+/g, "-");
+    const category = String(item.category || "")
+      .trim().toLowerCase().replace(/\s+/g, "-");
     const image = safeText(item.image_url);
     const price = Number(item.price) || 0;
-    const orderText = encodeURIComponent(
-      `I want to order ${item.name} for Rs. ${price}`
-    );
 
     return `
       <article class="food-card" data-category="${safeText(category)}">
@@ -2082,11 +2202,10 @@ async function loadMenu() {
           <div class="food-description">${description}</div>
           <div class="food-bottom">
             <div class="price">Rs. ${price}</div>
-            <a class="add-btn"
-              href="https://wa.me/923397860213?text=${orderText}"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Order ${name}">+</a>
+            <button type="button"
+              class="add-btn add-to-cart"
+              data-id="${item.id}"
+              aria-label="Add ${name} to cart">+</button>
           </div>
         </div>
       </article>
@@ -2096,6 +2215,8 @@ async function loadMenu() {
   const activeTab = document.querySelector(".menu-tab.active");
   filterMenu(activeTab ? activeTab.dataset.filter.toLowerCase() : "all");
 }
+
+renderCart();
 
 // Mobile navigation
 const menuButton = document.getElementById("mobileMenuBtn");
