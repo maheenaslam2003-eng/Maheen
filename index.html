@@ -2608,7 +2608,7 @@ if (checkoutForm && placeOrderBtn) {
       total_amount: totalAmount,
       status: "Pending"
     };
-
+alert("Order Type Sent: [" + orderData.order_type + "]");
     placeOrderBtn.disabled = true;
     placeOrderBtn.textContent = "Saving Order...";
     checkoutMessage.textContent = "Please wait, your order is being saved.";
