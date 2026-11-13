@@ -1533,6 +1533,97 @@ target="_blank">
   </div>
 </section>
 <!-- End Shopping Cart Section -->
+    
+<!-- ================= CHECKOUT SECTION ================= -->
+<section id="checkoutSection" class="cart-section" hidden>
+
+  <div class="container">
+
+    <h2>Complete Your Order 🍔</h2>
+    <p class="cart-subtitle">
+      Please enter your details to place your order.
+    </p>
+
+    <div id="checkoutSummary">
+      <!-- Order summary will appear here -->
+    </div>
+
+    <form id="checkoutForm">
+
+      <label for="customerName">Full Name</label>
+      <input
+        type="text"
+        id="customerName"
+        placeholder="Enter your full name"
+        required
+      >
+
+      <br><br>
+
+      <label for="customerPhone">Phone Number</label>
+      <input
+        type="tel"
+        id="customerPhone"
+        placeholder="03XXXXXXXXX"
+        pattern="03[0-9]{9}"
+        required
+      >
+
+      <br><br>
+
+      <label for="orderType">Order Type</label>
+      <select id="orderType" required>
+        <option value="">Select Order Type</option>
+        <option value="Delivery">Delivery</option>
+        <option value="Takeaway">Takeaway</option>
+      </select>
+
+      <br><br>
+
+      <div id="addressGroup">
+        <label for="customerAddress">Delivery Address</label>
+        <textarea
+          id="customerAddress"
+          placeholder="Enter your complete delivery address"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <br>
+
+      <label for="orderNotes">Order Notes (Optional)</label>
+      <textarea
+        id="orderNotes"
+        placeholder="Any special instructions?"
+        rows="3"
+      ></textarea>
+
+      <br><br>
+
+      <h3>
+        Total Amount:
+        <span id="checkoutFormTotal">Rs. 0</span>
+      </h3>
+
+      <br>
+
+      <button type="submit" id="placeOrderBtn">
+        Place Order
+      </button>
+
+      <button type="button" id="backToCartBtn">
+        Back to Cart
+      </button>
+
+      <p id="checkoutMessage"></p>
+
+    </form>
+
+  </div>
+
+</section>
+<!-- ================= END CHECKOUT SECTION ================= -->
+
 
 <section class="deals" id="deals">
 
