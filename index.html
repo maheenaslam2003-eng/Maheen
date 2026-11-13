@@ -2652,13 +2652,20 @@ if (checkoutForm && placeOrderBtn) {
 
       window.location.href = whatsappURL;
 
-    } catch (error) {
-      checkoutMessage.textContent =
-        "Order save nahi hua. Please try again.";
+  } catch (error) {
+  console.error("FULL ORDER ERROR:", error);
 
-      placeOrderBtn.disabled = false;
-      placeOrderBtn.textContent = "Place Order";
-    }
+  checkoutMessage.textContent =
+    "Error: " +
+    (error.message || "Unknown error") +
+    " | " +
+    (error.details || "") +
+    " | " +
+    (error.hint || "");
+
+  placeOrderBtn.disabled = false;
+  placeOrderBtn.textContent = "Place Order";
+}
   });
 }
 
