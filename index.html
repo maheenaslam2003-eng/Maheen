@@ -2602,7 +2602,7 @@ if (checkoutForm && placeOrderBtn) {
       customer_name: customerName,
       customer_phone: customerPhone,
       customer_address: orderType === "Delivery" ? customerAddress : "",
-      order_type: orderType,
+   order_type: orderType.toLowerCase(),
       notes: orderNotes,
       items: orderItems,
       total_amount: totalAmount,
