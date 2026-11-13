@@ -2485,6 +2485,39 @@ if (checkoutBtn && checkoutSection) {
 
 // ================= END CHECKOUT BUTTON =================
 
+// ===== DELIVERY / TAKEAWAY ADDRESS =====
+
+const orderTypeSelect = document.getElementById("orderType");
+const addressGroup = document.getElementById("addressGroup");
+const customerAddress = document.getElementById("customerAddress");
+
+if (orderTypeSelect && addressGroup && customerAddress) {
+
+  function updateAddressField() {
+
+    if (orderTypeSelect.value === "Delivery") {
+
+      addressGroup.style.display = "block";
+      customerAddress.required = true;
+
+    } else {
+
+      addressGroup.style.display = "none";
+      customerAddress.required = false;
+      customerAddress.value = "";
+
+    }
+
+  }
+
+  orderTypeSelect.addEventListener("change", updateAddressField);
+
+  updateAddressField();
+
+}
+
+// ===== END DELIVERY / TAKEAWAY =====
+
 // Start
 loadMenu();
 </script>
