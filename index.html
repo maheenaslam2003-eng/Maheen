@@ -2331,6 +2331,39 @@ menuButton.addEventListener("click", () => {
   menuButton.setAttribute("aria-expanded", isOpen);
 });
 
+// ================= CHECKOUT BUTTON =================
+
+const checkoutBtn = document.getElementById("checkoutBtn");
+const checkoutSection = document.getElementById("checkoutSection");
+const cartSection = document.getElementById("cart");
+
+if (checkoutBtn && checkoutSection) {
+
+  checkoutBtn.addEventListener("click", function () {
+
+    if (cart.length === 0) {
+      alert("Please add items to your cart first!");
+      return;
+    }
+
+    checkoutSection.hidden = false;
+
+    document.getElementById("checkoutSummary").innerHTML =
+      document.getElementById("cartItems").innerHTML;
+
+    document.getElementById("checkoutFormTotal").textContent =
+      document.getElementById("cartTotal").textContent;
+
+    checkoutSection.scrollIntoView({
+      behavior: "smooth"
+    });
+
+  });
+
+}
+
+// ================= END CHECKOUT BUTTON =================
+
 // Start
 loadMenu();
 </script>
