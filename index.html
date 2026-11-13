@@ -2559,6 +2559,111 @@ if (orderTypeSelect && addressGroup && customerAddress) {
 
 // ===== END DELIVERY / TAKEAWAY =====
 
+// ===== PLACE ORDER: SUPABASE + WHATSAPP =====
+
+const checkoutForm = document.getElementById("checkoutForm");
+const placeOrderBtn = document.getElementById("placeOrderBtn");
+
+if (checkoutForm && placeOrderBtn) {
+
+  checkoutForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    if (cart.length === 0) {
+      alert("Please add items to your cart first!");
+      return;
+    }
+
+    const customerName = document.getElementById("customerName").value.trim();
+    const customerPhone = document.getElementById("customerPhone").value.trim();
+    const orderType = document.getElementById("orderType").value;
+    const customerAddress = document.getElementById("customerAddress").value.trim();
+    const orderNotes = document.getElementById("orderNotes").value.trim();
+    const checkoutMessage = document.getElementById("checkoutMessage");
+
+    if (orderType === "Delivery" && !customerAddress) {
+      alert("Please enter your delivery address!");
+      return;
+    }
+
+    const totalAmount = cart.reduce(
+      (sum, item) => sum + Number(item.price) * Number(item.quantity),
+      0
+    );
+
+    const orderItems = cart.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: Number(item.price),
+      quantity: Number(item.quantity)
+    }));
+
+    const orderData = {
+      customer_name: customerName,
+      customer_phone: customerPhone,
+      customer_address: orderType === "Delivery" ? customerAddress : "",
+      order_type: orderType,
+      notes: orderNotes,
+      items: orderItems,
+      total_amount: totalAmount,
+      status: "Pending"
+    };
+
+    placeOrderBtn.disabled = true;
+    placeOrderBtn.textContent = "Saving Order...";
+    checkoutMessage.textContent = "Please wait, your order is being saved.";
+
+    try {
+      const { error } = await supabaseClient
+        .from("orders")
+        .insert([orderData]);
+
+      if (error) {
+        console.error("Order save error:", error);
+        throw error;
+      }
+
+      let whatsappMessage = `*NEW ORDER - HANIA FOOD SPOT*\n\n`;
+      whatsappMessage += `Name: ${customerName}\n`;
+      whatsappMessage += `Phone: ${customerPhone}\n`;
+      whatsappMessage += `Order Type: ${orderType}\n`;
+
+      if (orderType === "Delivery") {
+        whatsappMessage += `Address: ${customerAddress}\n`;
+      }
+
+      whatsappMessage += `\n*ORDER ITEMS:*\n`;
+
+      orderItems.forEach(item => {
+        whatsappMessage += `${item.name} x ${item.quantity} = Rs. ${item.price * item.quantity}\n`;
+      });
+
+      whatsappMessage += `\n*Total: Rs. ${totalAmount}*\n`;
+
+      if (orderNotes) {
+        whatsappMessage += `Notes: ${orderNotes}\n`;
+      }
+
+      checkoutMessage.textContent = "Order saved successfully! Opening WhatsApp...";
+
+      const whatsappURL =
+        "https://wa.me/923397860213?text=" +
+        encodeURIComponent(whatsappMessage);
+
+      window.location.href = whatsappURL;
+
+    } catch (error) {
+      checkoutMessage.textContent =
+        "Order save nahi hua. Please try again.";
+
+      placeOrderBtn.disabled = false;
+      placeOrderBtn.textContent = "Place Order";
+    }
+  });
+}
+
+// ===== END PLACE ORDER =====
+
 // Start
 loadMenu();
 </script>
