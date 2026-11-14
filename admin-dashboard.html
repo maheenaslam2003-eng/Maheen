@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hania Food Spot | Admin Dashboard</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f3ed;
+    color: #292929;
+}
+
+header {
+    background: #8c2d08;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+header h2 {
+    margin: 0;
+}
+
+button {
+    border: 0;
+    padding: 11px 17px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.logout {
+    background: white;
+    color: #8c2d08;
+}
+
+.container {
+    max-width: 1150px;
+    margin: auto;
+    padding: 25px 16px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.05);
+    overflow-x: auto;
+}
+
+h3 {
+    color: #8c2d08;
+    margin-top: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+th, td {
+    text-align: left;
+    padding: 13px;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background: #fff5ed;
+}
+
+.status {
+    padding: 6px 10px;
+    background: #fff0dc;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+#message {
+    text-align: center;
+    padding: 12px;
+    color: #8c2d08;
+}
+
+@media(max-width:600px) {
+    header {
+        align-items: flex-start;
+    }
+
+    .container {
+        padding: 15px 10px;
+    }
+
+    .card {
+        padding: 13px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>Hania Food Spot Admin</h2>
+    <button class="logout" id="logoutBtn">Logout</button>
+</header>
+
+<div class="container">
+
+    <p id="message">Verifying admin account...</p>
+
+    <section class="card">
+        <h3>Menu Management</h3>
+        <p>Current food items in your Supabase menu.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Food Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Availability</th>
+                </tr>
+            </thead>
+            <tbody id="menuTable">
+                <tr><td colspan="5">Loading menu...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card">
+        <h3>Customer Orders</h3>
+        <p>Recent orders received from your website.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Order Type</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTable">
+                <tr><td colspan="6">Loading orders...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+"https://mybyqwannrnnviumocfw.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_c3qgzTFf23oeKpEoI9rONg_xZnw6g7M";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+const message = document.getElementById("message");
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, function(char) {
+        return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        }[char];
+    });
+}
+
+async function checkAdmin() {
+
+    const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        window.location.href = "admin.html";
+        return false;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (error || !data) {
+        await supabaseClient.auth.signOut();
+        message.textContent = "Access denied. Admin only.";
+        return false;
+    }
+
+    message.textContent = "Admin verified successfully!";
+    return true;
+}
+
+async function loadMenu() {
+
+    const { data, error } = await supabaseClient
+        .from("menu_items")
+        .select("id, name, category, price, available")
+        .order("sort_order", { ascending: true });
+
+    const table = document.getElementById("menuTable");
+
+    if (error) {
+        table.innerHTML =
+            '<tr><td colspan="5">Menu error: ' +
+            escapeHTML(error.message) + '</td></tr>';
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        table.innerHTML =
+            '<tr><td colspan="5">No menu items found.</td></tr>';
+        return;
+    }
+
+    table.innerHTML = data.map(item => `
+        <tr>
+            <td>${escapeHTML(item.id)}</td>
+            <td>${escapeHTML(item.name)}</td>
+            <td>${escapeHTML(item.category)}</td>
+            <td>Rs. ${escapeHTML(item.price)}</td>
+            <td>
+                <span class="status">
+                    ${item.available ? "Available" : "Unavailable"}
+                </span>
+            </td>
+        </tr>
+    `).join("");
+}
+
+async function loadOrders() {
+
+    const { data, error } = await supabaseClient
+        .from("orders")
+        .select("id, customer_name, customer_phone, order_type, total_amount, status")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+    const table = document.getElementById("ordersTable");
+
+    if (error) {
+        table.innerHTML =
+            '<tr><td colspan="6">Orders error: ' +
+            escapeHTML(error.message) + '</td></tr>';
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        table.innerHTML =
+            '<tr><td colspan="6">No orders found.</td></tr>';
+        return;
+    }
+
+    table.innerHTML = data.map(order => `
+        <tr>
+            <td>${escapeHTML(order.id)}</td>
+            <td>${escapeHTML(order.customer_name)}</td>
+            <td>${escapeHTML(order.customer_phone)}</td>
+            <td>${escapeHTML(order.order_type)}</td>
+            <td>Rs. ${escapeHTML(order.total_amount)}</td>
+            <td>${escapeHTML(order.status)}</td>
+        </tr>
+    `).join("");
+}
+
+document.getElementById("logoutBtn")
+.addEventListener("click", async function() {
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href = "admin.html";
+
+});
+
+(async function() {
+
+    const isAdmin = await checkAdmin();
+
+    if (isAdmin) {
+        await loadMenu();
+        await loadOrders();
+    }
+
+})();
+
+</script>
+
+</body>
+</html>
