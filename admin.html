@@ -1,1 +1,266 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hania Food Spot | Admin Login</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f7f3ed;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.09);
+}
+
+h1 {
+    text-align: center;
+    color: #8c2d08;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 28px;
+}
+
+label {
+    display: block;
+    margin: 15px 0 7px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 9px;
+    font-size: 15px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 18px;
+    border: none;
+    border-radius: 9px;
+    background: #8c2d08;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.google-btn {
+    background: #252525;
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+#message {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h1>Hania Food Spot</h1>
+    <p class="subtitle">Secure Admin Login</p>
+
+    <form id="loginForm">
+
+        <label for="email">Admin Email</label>
+        <input
+            type="email"
+            id="email"
+            required
+            placeholder="Enter admin email"
+        >
+
+        <label for="password">Password</label>
+        <input
+            type="password"
+            id="password"
+            required
+            placeholder="Enter password"
+        >
+
+        <button type="submit" id="loginBtn">
+            Login
+        </button>
+
+    </form>
+
+    <button type="button" class="google-btn" id="googleBtn">
+        Continue with Google
+    </button>
+
+    <p id="message"></p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+// Supabase project settings
+const SUPABASE_URL =
+"https://mybyqwannrnnviumocfw.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+const message = document.getElementById("message");
+const loginBtn = document.getElementById("loginBtn");
+const googleBtn = document.getElementById("googleBtn");
+
+function showMessage(text, color = "red") {
+    message.textContent = text;
+    message.style.color = color;
+}
+
+// Check whether logged-in user is an authorized admin
+async function verifyAdmin() {
+
+    showMessage("Checking admin permission...", "#8c2d08");
+
+    const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        showMessage("Please login first.");
+        return false;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (error || !data) {
+
+        await supabaseClient.auth.signOut();
+
+        showMessage(
+            "Access denied. This account is not an authorized admin."
+        );
+
+        return false;
+    }
+
+    showMessage(
+        "Admin verified successfully! Dashboard will be added next.",
+        "green"
+    );
+
+    return true;
+}
+
+// Email and password login
+document.getElementById("loginForm")
+.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    loginBtn.disabled = true;
+    showMessage("Signing in...", "#8c2d08");
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { error } = await supabaseClient.auth
+        .signInWithPassword({
+            email: email,
+            password: password
+        });
+
+    if (error) {
+
+        showMessage(error.message);
+        loginBtn.disabled = false;
+        return;
+
+    }
+
+    await verifyAdmin();
+
+    loginBtn.disabled = false;
+
+});
+
+// Google login
+googleBtn.addEventListener("click", async function() {
+
+    googleBtn.disabled = true;
+    showMessage("Opening Google login...", "#8c2d08");
+
+    const redirectURL =
+        window.location.origin + window.location.pathname;
+
+    const { error } = await supabaseClient.auth
+        .signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: redirectURL
+            }
+        });
+
+    if (error) {
+        showMessage(error.message);
+        googleBtn.disabled = false;
+    }
+
+});
+
+// Check existing session after page loads
+(async function() {
+
+    const { data: { session } } =
+        await supabaseClient.auth.getSession();
+
+    if (session) {
+        await verifyAdmin();
+    }
+
+})();
+
+</script>
+
+</body>
+</html>
+
