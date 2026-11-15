@@ -349,6 +349,70 @@ document.getElementById("logoutBtn")
 
 })();
 
+document.getElementById("menuForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const submitButton = this.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = "Uploading...";
+
+    try {
+        const name = document.getElementById("foodName").value.trim();
+        const category = document.getElementById("foodCategory").value;
+        const price = Number(document.getElementById("foodPrice").value);
+        const imageFile = document.getElementById("foodImage").files[0];
+        const popular = document.getElementById("foodPopular").checked;
+        const available = document.getElementById("foodAvailable").checked;
+
+        if (!imageFile) {
+            throw new Error("Please select a food image.");
+        }
+
+        const extension = imageFile.name.split(".").pop().toLowerCase();
+        const fileName = `${Date.now()}.${extension}`;
+        const filePath = fileName;
+
+        const { error: uploadError } = await supabaseClient
+            .storage
+            .from("menu-images")
+            .upload(filePath, imageFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: imageData } = supabaseClient
+            .storage
+            .from("menu-images")
+            .getPublicUrl(filePath);
+
+        const imageUrl = imageData.publicUrl;
+
+        const { error: insertError } = await supabaseClient
+            .from("menu_items")
+            .insert([{
+                name: name,
+                category: category,
+                price: price,
+                image_url: imageUrl,
+                popular: popular,
+                available: available
+            }]);
+
+        if (insertError) throw insertError;
+
+        alert("Food item successfully added!");
+        this.reset();
+        document.getElementById("foodAvailable").checked = true;
+
+        await loadMenu();
+
+    } catch (error) {
+        alert("Error: " + error.message);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Save Menu Item";
+    }
+});
+
 </script>
 
 </body>
