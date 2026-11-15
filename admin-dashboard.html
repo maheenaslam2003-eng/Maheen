@@ -286,11 +286,15 @@ async function loadMenu() {
             <td>${escapeHTML(item.name)}</td>
             <td>${escapeHTML(item.category)}</td>
             <td>Rs. ${escapeHTML(item.price)}</td>
-            <td>
-                <span class="status">
-                    ${item.available ? "Available" : "Unavailable"}
-                </span>
-            </td>
+           <td>
+    <span class="status">
+        ${item.available ? "Available" : "Unavailable"}
+    </span>
+</td>
+<td>
+    <button onclick="editMenuItem(${item.id})">Edit</button>
+    <button onclick="deleteMenuItem(${item.id})">Delete</button>
+</td>
         </tr>
     `).join("");
 }
