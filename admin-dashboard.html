@@ -181,6 +181,64 @@ th {
     </section>
 
     <section class="card">
+        
+<!-- Edit Food Popup -->
+<div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9999; justify-content:center; align-items:center; padding:20px;">
+
+    <div style="background:white; padding:25px; border-radius:15px; width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
+
+        <h3>Edit Food Item</h3>
+
+        <form id="editForm">
+
+            <label>Food Name</label>
+            <input type="text" id="editFoodName" required>
+
+            <br><br>
+
+            <label>Category</label>
+            <select id="editFoodCategory" required>
+                <option value="Burgers">Burgers</option>
+                <option value="Shawarma">Shawarma</option>
+                <option value="Paratha Rolls">Paratha Rolls</option>
+                <option value="Platters">Platters</option>
+                <option value="Sandwiches">Sandwiches</option>
+            </select>
+
+            <br><br>
+
+            <label>Price (Rs.)</label>
+            <input type="number" id="editFoodPrice" min="1" required>
+
+            <br><br>
+
+            <label>Current Food Image</label>
+            <img id="editImagePreview" src="" style="width:120px; display:block; margin:10px 0;">
+
+            <label>Replace Image (Optional)</label>
+            <input type="file" id="editFoodImage" accept="image/*">
+
+            <br><br>
+
+            <label>
+                <input type="checkbox" id="editFoodAvailable">
+                Available
+            </label>
+
+            <br><br>
+
+            <button type="submit" style="background:#8c2d08; color:white;">
+                Save Changes
+            </button>
+
+            <button type="button" onclick="closeEditModal()" style="background:#ddd;">
+                Cancel
+            </button>
+
+        </form>
+    </div>
+</div>
+
         <h3>Customer Orders</h3>
         <p>Recent orders received from your website.</p>
 
@@ -262,7 +320,7 @@ async function loadMenu() {
 
     const { data, error } = await supabaseClient
         .from("menu_items")
-        .select("id, name, category, price, available")
+       .select("id, name, category, price, available, image_url")
         .order("sort_order", { ascending: true });
 
     const table = document.getElementById("menuTable");
