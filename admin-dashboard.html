@@ -299,6 +299,49 @@ async function loadMenu() {
     `).join("");
 }
 
+async function editMenuItem(id) {
+    const newName = prompt("Enter new food name:");
+    if (newName === null || newName.trim() === "") return;
+
+    const newPrice = prompt("Enter new food price:");
+    if (newPrice === null || newPrice.trim() === "") return;
+
+    const { error } = await supabaseClient
+        .from("menu_items")
+        .update({
+            name: newName.trim(),
+            price: Number(newPrice)
+        })
+        .eq("id", id);
+
+    if (error) {
+        alert("Update error: " + error.message);
+        return;
+    }
+
+    alert("Food item updated successfully!");
+    await loadMenu();
+}
+
+async function deleteMenuItem(id) {
+    const confirmed = confirm("Are you sure you want to delete this food item?");
+
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient
+        .from("menu_items")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        alert("Delete error: " + error.message);
+        return;
+    }
+
+    alert("Food item deleted successfully!");
+    await loadMenu();
+}
+
 async function loadOrders() {
 
     const { data, error } = await supabaseClient
