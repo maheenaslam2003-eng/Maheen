@@ -126,6 +126,43 @@ th {
         <h3>Menu Management</h3>
         <p>Current food items in your Supabase menu.</p>
 
+<div class="card">
+    <h3>Add New Food Item</h3>
+
+    <form id="menuForm">
+        <label>Food Name</label>
+        <input type="text" id="foodName" placeholder="Enter food name" required>
+
+        <label>Category</label>
+        <select id="foodCategory" required>
+            <option value="">Select category</option>
+            <option value="Burgers">Burgers</option>
+            <option value="Shawarma">Shawarma</option>
+            <option value="Paratha Rolls">Paratha Rolls</option>
+            <option value="Platters">Platters</option>
+            <option value="Sandwiches">Sandwiches</option>
+        </select>
+
+        <label>Price (Rs.)</label>
+        <input type="number" id="foodPrice" min="1" placeholder="Enter price" required>
+
+        <label>Food Image</label>
+        <input type="file" id="foodImage" accept="image/*" required>
+
+        <label>
+            <input type="checkbox" id="foodPopular">
+            Popular item
+        </label>
+
+        <label>
+            <input type="checkbox" id="foodAvailable" checked>
+            Available
+        </label>
+
+        <button type="submit">Save Menu Item</button>
+    </form>
+</div>
+
         <table>
             <thead>
                 <tr>
