@@ -251,10 +251,11 @@ th {
                     <th>Order Type</th>
                     <th>Total</th>
                     <th>Status</th>
-                </tr>
+                    <th>Update Status</th>
+                    </tr>
             </thead>
             <tbody id="ordersTable">
-                <tr><td colspan="6">Loading orders...</td></tr>
+               <tr><td colspan="7">Loading orders...</td></tr>
             </tbody>
         </table>
     </section>
@@ -476,6 +477,7 @@ async function deleteMenuItem(id) {
     await loadMenu();
 }
 
+
 async function loadOrders() {
 
     const { data, error } = await supabaseClient
@@ -488,14 +490,14 @@ async function loadOrders() {
 
     if (error) {
         table.innerHTML =
-            '<tr><td colspan="6">Orders error: ' +
+            '<tr><td colspan="7">Orders error: ' +
             escapeHTML(error.message) + '</td></tr>';
         return;
     }
 
     if (!data || data.length === 0) {
         table.innerHTML =
-            '<tr><td colspan="6">No orders found.</td></tr>';
+            '<tr><td colspan="7">No orders found.</td></tr>';
         return;
     }
 
@@ -507,9 +509,23 @@ async function loadOrders() {
             <td>${escapeHTML(order.order_type)}</td>
             <td>Rs. ${escapeHTML(order.total_amount)}</td>
             <td>${escapeHTML(order.status)}</td>
+            <td>
+                <select id="orderStatus-${Number(order.id)}">
+                    <option value="pending" ${order.status === "pending" ? "selected" : ""}>Pending</option>
+                    <option value="confirmed" ${order.status === "confirmed" ? "selected" : ""}>Confirmed</option>
+                    <option value="preparing" ${order.status === "preparing" ? "selected" : ""}>Preparing</option>
+                    <option value="completed" ${order.status === "completed" ? "selected" : ""}>Completed</option>
+                    <option value="cancelled" ${order.status === "cancelled" ? "selected" : ""}>Cancelled</option>
+                </select>
+
+                <button onclick="updateOrderStatus(${Number(order.id)})">
+                    Save
+                </button>
+            </td>
         </tr>
     `).join("");
 }
+
 
 document.getElementById("logoutBtn")
 .addEventListener("click", async function() {
