@@ -547,6 +547,26 @@ document.getElementById("logoutBtn")
 
 })();
 
+    async function updateOrderStatus(id) {
+
+    const select = document.getElementById("orderStatus-" + id);
+    const newStatus = select.value;
+
+    const { error } = await supabaseClient
+        .from("orders")
+        .update({ status: newStatus })
+        .eq("id", id);
+
+    if (error) {
+        alert("Status update error: " + error.message);
+        return;
+    }
+
+    alert("Order status updated successfully!");
+
+    await loadOrders();
+}
+
 document.getElementById("menuForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
