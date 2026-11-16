@@ -154,6 +154,7 @@ function showMessage(text, color = "red") {
 }
 
 // Check whether logged-in user is an authorized admin
+
 async function verifyAdmin() {
 
     showMessage("Checking admin permission...", "#8c2d08");
@@ -183,13 +184,13 @@ async function verifyAdmin() {
         return false;
     }
 
-    showMessage(
-        "Admin verified successfully! Dashboard will be added next.",
-        "green"
-    );
+    showMessage("Admin verified successfully!", "green");
+
+    window.location.replace("admin-dashboard.html");
 
     return true;
 }
+
 
 // Email and password login
 document.getElementById("loginForm")
